@@ -51,7 +51,7 @@
 <body class="themed-bg-base text-slate-800 min-h-screen flex flex-col font-sans overflow-x-hidden transition-colors duration-300">
 
   <!-- APP HEADER -->
-  <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-sm transition-colors duration-300">
+  <header class="themed-bg-header border-b themed-border-element px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-sm transition-colors duration-300">
     <div class="flex items-center gap-3">
       <div class="theme-bg text-white p-2.5 rounded-2xl flex items-center justify-center font-black text-xl tracking-wider shadow-md transition-all duration-300">
         <i class="fa-solid fa-comments mr-1.5"></i>Safe<span class="text-sky-100">CHAT+</span>
@@ -61,6 +61,13 @@
         <span id="user-status-badge">Authenticating...</span>
       </span>
       <span id="user-profile-name" class="text-xs text-slate-600 font-bold hidden bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg shadow-sm"></span>
+      
+      <!-- Live User Counter -->
+      <div class="bg-slate-100 border border-slate-200 text-slate-600 font-bold px-3 py-1 rounded-lg text-xs shadow-sm flex items-center gap-1.5 ml-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="live-count-text">0 Online</span>
+      </div>
+
     </div>
 
     <!-- HEADER CONTROLS (Theme Selector & Sidebar Toggle) -->
@@ -142,7 +149,7 @@
           <!-- Share Screen Button -->
           <button id="btn-toggle-screen" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl border border-slate-200 transition flex items-center gap-1.5 font-bold shadow-sm" title="Share Screen">
             <i id="icon-screen" class="fa-solid fa-desktop text-slate-600"></i>
-            <span class="hidden sm:inline text-[10px] text-slate-600" id="txt-screen-share">Share Screen</span>
+            <span class="hidden sm:inline text-[10px] text-slate-600">Share Screen</span>
           </button>
         </div>
       </div>
@@ -189,20 +196,27 @@
       </div>
 
       <!-- MATCH CONTROLS HEADER -->
-      <div class="themed-bg-surface p-3 border-b themed-border-element flex items-center justify-between gap-4 transition-colors duration-300 shadow-sm">
+      <div class="themed-bg-surface p-3 border-b themed-border-element flex items-center justify-between gap-4 transition-colors duration-300 shadow-sm overflow-x-auto">
         <div class="flex items-center gap-2">
-          <button id="btn-action" class="theme-bg theme-bg-hover text-white font-bold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition duration-200 text-sm shadow-md">
+          <button id="btn-action" class="theme-bg theme-bg-hover text-white font-bold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition duration-200 text-sm shadow-md whitespace-nowrap">
             <i class="fa-solid fa-magnifying-glass text-xs"></i>
             <span id="txt-action">Find Match</span>
           </button>
-          <button id="btn-stop" disabled class="bg-slate-100 text-slate-400 border border-slate-200 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition duration-200 text-sm cursor-not-allowed">
+          
+          <!-- NEW: Next Button -->
+          <button id="btn-next" disabled class="bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl hover:bg-slate-700 transition duration-200 text-sm flex items-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+            <span>Next</span>
+            <i class="fa-solid fa-forward-step text-xs"></i>
+          </button>
+
+          <button id="btn-stop" disabled class="bg-slate-100 text-slate-400 border border-slate-200 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition duration-200 text-sm cursor-not-allowed whitespace-nowrap">
             <i class="fa-solid fa-circle-stop"></i>
             <span>Stop</span>
           </button>
         </div>
 
         <!-- Add Friend trigger -->
-        <button id="btn-add-contact" class="hidden bg-slate-100 theme-text border border-slate-200 hover:theme-bg hover:text-white px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-1.5 text-xs font-bold shadow-sm">
+        <button id="btn-add-contact" class="hidden bg-slate-100 theme-text border border-slate-200 hover:theme-bg hover:text-white px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-1.5 text-xs font-bold shadow-sm whitespace-nowrap">
           <i class="fa-solid fa-user-plus"></i>
           <span>Add Friend</span>
         </button>
@@ -284,7 +298,7 @@
               </button>
               <div>
                 <h4 id="direct-chat-title" class="font-bold text-xs text-slate-700">Contact Chat</h4>
-                <p class="text-[9px] text-emerald-400 font-semibold uppercase tracking-wider">Direct Message Session</p>
+                <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider">Direct Message Session</p>
               </div>
             </div>
             
@@ -397,25 +411,8 @@
       arrayUnion 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Provided Web App Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCceMp0anYWwZfh-9LiWYSA5qeLl1OMsKo",
-      authDomain: "nsfwomegle18.firebaseapp.com",
-      projectId: "nsfwomegle18",
-      storageBucket: "nsfwomegle18.firebasestorage.app",
-      messagingSenderId: "613267864399",
-      appId: "1:613267864399:web:3831b8d1f9906c5306633a"
-    };
-
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'nsfwomegle18';
-    
-    // Initialize services
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
     // Global Alert system (Declared globally at the very top of module scope)
-    function showToast(message, type = 'info') {
+    window.showToast = function(message, type = 'info') {
       const toast = document.getElementById('toast');
       const toastIcon = document.getElementById('toast-icon');
       const toastMessage = document.getElementById('toast-message');
@@ -439,6 +436,23 @@
         toast.classList.add('opacity-0', 'translate-y-2');
       }, 4000);
     }
+
+    // Provided Web App Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCceMp0anYWwZfh-9LiWYSA5qeLl1OMsKo",
+      authDomain: "nsfwomegle18.firebaseapp.com",
+      projectId: "nsfwomegle18",
+      storageBucket: "nsfwomegle18.firebasestorage.app",
+      messagingSenderId: "613267864399",
+      appId: "1:613267864399:web:3831b8d1f9906c5306633a"
+    };
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'nsfwomegle18';
+    
+    // Initialize services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     // Dynamic wholesome animal name generator to personalize user experiences
     const prefixes = ["Shiny", "Happy", "Kind", "Cool", "Cheerful", "Brave", "Joyful", "Swift", "Calm", "Gentle"];
@@ -516,6 +530,7 @@
     
     // Match selectors
     const btnAction = document.getElementById('btn-action');
+    const btnNext = document.getElementById('btn-next');
     const btnStop = document.getElementById('btn-stop');
     const txtAction = document.getElementById('txt-action');
     const btnAddContact = document.getElementById('btn-add-contact');
@@ -529,6 +544,9 @@
     const userStatusBadge = document.getElementById('user-status-badge');
     const userProfileName = document.getElementById('user-profile-name');
     const typingIndicatorMatch = document.getElementById('typing-indicator-match');
+
+    // Live Counter Selector
+    const liveCountText = document.getElementById('live-count-text');
 
     // Contacts hub selectors
     const contactsListView = document.getElementById('contacts-list-view');
@@ -571,7 +589,6 @@
     // UI Color Theme Config Mapping (Theme variables update the layout background completely)
     const themes = {
       amber: { primary: "#0284c7", hover: "#0369a1", light: "rgba(2, 132, 199, 0.1)", bgBase: "#f8fafc", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#e2e8f0" },
-      blue: { primary: "#2563eb", hover: "#1d4ed8", light: "rgba(37, 99, 235, 0.1)", bgBase: "#f0f4fe", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#cbd5e1" },
       emerald: { primary: "#0d9488", hover: "#0f766e", light: "rgba(13, 148, 136, 0.1)", bgBase: "#f0fdfa", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#ccfbf1" },
       indigo: { primary: "#6366f1", hover: "#4f46e5", light: "rgba(99, 102, 241, 0.1)", bgBase: "#f5f3ff", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#e0e7ff" },
       purple: { primary: "#8b5cf6", hover: "#7c3aed", light: "rgba(139, 92, 246, 0.1)", bgBase: "#faf5ff", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#f3e8ff" },
@@ -619,7 +636,7 @@
           background: var(--color-primary);
         }
       `;
-      showToast(`Theme updated to ${e.target.options[e.target.selectedIndex].text}!`);
+      window.showToast(`Theme updated to ${e.target.options[e.target.selectedIndex].text}!`);
     });
 
     // Sidebar Collapsing toggle
@@ -630,13 +647,13 @@
         rightContactsPanel.classList.remove('hidden');
         workspaceMatchPanel.className = "w-full lg:w-2/3 flex flex-col themed-bg-base border-r themed-border-element relative h-full transition-all duration-300";
         txtToggleSidebar.textContent = "Hide Contacts";
-        showToast("Contacts Hub visible");
+        window.showToast("Contacts Hub visible");
       } else {
         // Collapse
         rightContactsPanel.classList.add('hidden');
         workspaceMatchPanel.className = "w-full lg:w-full flex flex-col themed-bg-base relative h-full transition-all duration-300";
         txtToggleSidebar.textContent = "Show Contacts";
-        showToast("Contacts Hub collapsed");
+        window.showToast("Contacts Hub collapsed");
       }
     });
 
@@ -659,10 +676,16 @@
         }
         
         userId = userCredential.user.uid;
-        userStatusBadge.textContent = "Online";
-        userProfileName.textContent = `You: ${userName}`;
-        userProfileName.classList.remove('hidden');
+        if (userStatusBadge) userStatusBadge.textContent = "Online";
+        
+        if (userProfileName) {
+          userProfileName.textContent = `You: ${userName}`;
+          userProfileName.classList.remove('hidden');
+        }
         console.log("Logged in authenticated user ID as:", userId, userName);
+
+        // Start listening to active user count in matchmaking queue
+        initLiveCounterStream();
 
         // Initialize personal contacts stream listener
         initContactsStream();
@@ -672,9 +695,21 @@
 
       } catch (err) {
         console.error("Auth failed completely:", err);
-        showToast("Authentication failed. Please reload.", "error");
-        userStatusBadge.textContent = "Offline";
+        window.showToast("Authentication failed. Please reload.", "error");
+        if (userStatusBadge) userStatusBadge.textContent = "Offline";
       }
+    }
+
+    // Real-time counter of users in the matchmaking queue
+    function initLiveCounterStream() {
+      const queueCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'queue');
+      onSnapshot(queueCollectionRef, (snapshot) => {
+        // Real-time calculation of active queue documents
+        const activeUsers = snapshot.size;
+        if (liveCountText) liveCountText.textContent = `${activeUsers} Online`;
+      }, (err) => {
+        console.error("Failed to read live user count:", err);
+      });
     }
 
     // Load available camera and microphone devices
@@ -738,7 +773,7 @@
         await loadMediaDevices();
       } catch (err) {
         console.warn("Camera/Mic stream block warning:", err);
-        showToast("Webcam/Audio device inaccessible.", "error");
+        window.showToast("Webcam/Audio device inaccessible.", "error");
       }
     }
 
@@ -782,10 +817,10 @@
             await audioSender.replaceTrack(audioTrack);
           }
         }
-        showToast("Media input devices updated!");
+        window.showToast("Media input devices updated!");
       } catch (err) {
         console.error("Device swap failed:", err);
-        showToast("Error switching media devices.", "error");
+        window.showToast("Error switching media devices.", "error");
       }
     }
 
@@ -834,10 +869,10 @@
           btnToggleScreen.classList.add('bg-red-500', 'text-white', 'hover:bg-red-600');
           iconScreen.className = "fa-solid fa-desktop text-white animate-pulse";
           
-          showToast("Screen sharing started!", "success");
+          window.showToast("Screen sharing started!", "success");
         } catch (err) {
           console.warn("Screen share session canceled or failed:", err);
-          showToast("Screen sharing was not started.", "info");
+          window.showToast("Screen sharing was not started.", "info");
         }
       } else {
         await stopScreenShare();
@@ -884,7 +919,7 @@
       btnToggleScreen.classList.remove('bg-red-500', 'text-white', 'hover:bg-red-600');
       iconScreen.className = "fa-solid fa-desktop text-slate-600";
       
-      showToast("Screen sharing stopped.");
+      window.showToast("Screen sharing stopped.");
     }
 
     btnToggleScreen.addEventListener('click', toggleScreenShare);
@@ -895,8 +930,8 @@
         const audioTrack = localStream.getAudioTracks()[0];
         if (audioTrack) {
           audioTrack.enabled = !audioTrack.enabled;
-          iconMic.className = audioTrack.enabled ? "fa-solid fa-microphone" : "fa-solid fa-microphone-slash text-rose-500";
-          showToast(audioTrack.enabled ? "Microphone active" : "Microphone muted");
+          iconMic.className = audioTrack.enabled ? "fa-solid fa-microphone text-slate-600" : "fa-solid fa-microphone-slash text-rose-500";
+          window.showToast(audioTrack.enabled ? "Microphone active" : "Microphone muted");
         }
       }
     });
@@ -906,8 +941,8 @@
         const videoTrack = localStream.getVideoTracks()[0];
         if (videoTrack) {
           videoTrack.enabled = !videoTrack.enabled;
-          iconCam.className = videoTrack.enabled ? "fa-solid fa-video" : "fa-solid fa-video-slash text-rose-500";
-          showToast(videoTrack.enabled ? "Webcam active" : "Webcam muted");
+          iconCam.className = videoTrack.enabled ? "fa-solid fa-video text-slate-600" : "fa-solid fa-video-slash text-rose-500";
+          window.showToast(videoTrack.enabled ? "Webcam active" : "Webcam muted");
         }
       }
     });
@@ -940,8 +975,9 @@
       txtAction.textContent = "Finding match...";
       btnAction.disabled = true;
       btnStop.disabled = false;
-      btnStop.classList.remove('cursor-not-allowed', 'text-slate-500');
-      btnStop.classList.add('text-rose-500', 'border-rose-500/20');
+      btnNext.disabled = false;
+      btnStop.classList.remove('cursor-not-allowed', 'text-slate-400');
+      btnStop.classList.add('text-rose-500');
       btnAddContact.classList.add('hidden');
       
       remotePlaceholderTitle.textContent = "Searching Room";
@@ -1229,11 +1265,11 @@
           addedAt: Date.now()
         });
 
-        showToast(`${activeMatchName} was added to contacts! Check the Contacts Hub.`, 'success');
+        window.showToast(`${activeMatchName} was added to contacts! Check the Contacts Hub.`, 'success');
         btnAddContact.classList.add('hidden');
       } catch (err) {
         console.error("Failed adding contact:", err);
-        showToast("Failed to save contact. Please try again.", "error");
+        window.showToast("Failed to save contact. Please try again.", "error");
       }
     });
 
@@ -1357,7 +1393,7 @@
       if (!file) return;
 
       if (file.size > 500 * 1024) {
-        showToast("Attachments must be under 500KB to stay optimized.", "error");
+        window.showToast("Attachments must be under 500KB to stay optimized.", "error");
         directFileInput.value = "";
         return;
       }
@@ -1499,7 +1535,7 @@
 
         // Cancel / Rejected/ Ended Call
         if (data.status === 'declined' || data.status === 'ended') {
-          showToast(`Call was declined or ended.`, 'error');
+          window.showToast(`Call was declined or ended.`, 'error');
           stopDirectCall();
         }
 
@@ -1511,7 +1547,7 @@
           flushIceCandidatesQueue();
           
           outgoingCallModal.classList.add('hidden');
-          showToast(`Call connected with ${name}!`, 'success');
+          window.showToast(`Call connected with ${name}!`, 'success');
         }
 
         // Load callee Ice candidates
@@ -1852,12 +1888,22 @@
       txtAction.textContent = "Find Match";
       btnAction.disabled = false;
       btnStop.disabled = true;
-      btnStop.className = "bg-slate-100 text-slate-400 border border-slate-200 font-bold px-5 py-3.5 rounded-2xl hover:bg-slate-200 hover:text-slate-700 transition duration-300 flex items-center justify-center gap-2 cursor-not-allowed";
+      btnNext.disabled = true;
+      btnStop.className = "bg-slate-100 text-slate-400 border border-slate-200 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition duration-200 text-sm cursor-not-allowed whitespace-nowrap";
       
       remotePlaceholderTitle.textContent = "Disconnected";
       remotePlaceholderDesc.textContent = "Session closed. Tap 'Find Match' to initiate another connection.";
       addSystemMessage("You disconnected.");
     }
+    
+    // NEW: Handled "Next" Button Click
+    btnNext.addEventListener('click', async () => {
+      if (isConnected || isSearching) {
+        addSystemMessage("Skipping to next match...");
+        await cleanupRoomState();
+        startMatchmaking();
+      }
+    });
 
     function handlePeerExit() {
       cleanupRoomState();
@@ -1866,7 +1912,8 @@
       txtAction.textContent = "Find Match";
       btnAction.disabled = false;
       btnStop.disabled = true;
-      btnStop.className = "bg-slate-100 text-slate-400 border border-slate-200 font-bold px-5 py-3.5 rounded-2xl hover:bg-slate-200 hover:text-slate-700 transition duration-300 flex items-center justify-center gap-2 cursor-not-allowed";
+      btnNext.disabled = true;
+      btnStop.className = "bg-slate-100 text-slate-400 border border-slate-200 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition duration-200 text-sm cursor-not-allowed whitespace-nowrap";
       
       remotePlaceholderTitle.textContent = "Disconnected";
       remotePlaceholderDesc.textContent = "Your companion left the room. Let's find someone new!";
@@ -1875,7 +1922,7 @@
 
     function addSystemMessage(text) {
       const msgWrapper = document.createElement('div');
-      msgWrapper.className = "flex justify-center my-1";
+      msgWrapper.className = "flex justify-center my-1.5";
       msgWrapper.innerHTML = `
         <div class="bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-bold px-3.5 py-1.5 rounded-full tracking-wide">
           ${text}
