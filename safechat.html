@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeCHAT+ | Live Video, Chats & Contacts</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Dynamic Theme CSS Custom Properties (Light Playful Theme Default) -->
+  <style id="dynamic-theme">
+    :root {
+      --color-primary: #0284c7;
+      --color-primary-hover: #0369a1;
+      --color-primary-light: rgba(2, 132, 199, 0.1);
+      --color-bg-base: #f8fafc;
+      --color-bg-surface: #ffffff;
+      --color-bg-header: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text-main: #0f172a;
+    }
+    .themed-bg-base { background-color: var(--color-bg-base) !important; }
+    .themed-bg-surface { background-color: var(--color-bg-surface) !important; }
+    .themed-bg-header { background-color: var(--color-bg-header) !important; }
+    .themed-border-element { border-color: var(--color-border) !important; }
+    
+    .theme-bg { background-color: var(--color-primary) !important; }
+    .theme-bg-hover:hover { background-color: var(--color-primary-hover) !important; }
+    .theme-text { color: var(--color-primary) !important; }
+    .theme-border { border-color: var(--color-primary) !important; }
+    .theme-bg-light { background-color: var(--color-primary-light) !important; }
+    
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg-base);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-primary);
+    }
+  </style>
+</head>
+<body class="themed-bg-base text-slate-800 min-h-screen flex flex-col font-sans overflow-x-hidden transition-colors duration-300">
+
+  <!-- APP HEADER -->
+  <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-sm transition-colors duration-300">
+    <div class="flex items-center gap-3">
+      <div class="theme-bg text-white p-2.5 rounded-2xl flex items-center justify-center font-black text-xl tracking-wider shadow-md transition-all duration-300">
+        <i class="fa-solid fa-comments mr-1.5"></i>Safe<span class="text-sky-100">CHAT+</span>
+      </div>
+      <span class="theme-bg-light theme-text border theme-border/25 text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 font-bold transition-all duration-300">
+        <span class="w-2 h-2 rounded-full theme-bg animate-ping"></span>
+        <span id="user-status-badge">Authenticating...</span>
+      </span>
+      <span id="user-profile-name" class="text-xs text-slate-600 font-bold hidden bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg shadow-sm"></span>
+    </div>
+
+    <!-- HEADER CONTROLS (Theme Selector & Sidebar Toggle) -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <!-- UI Accent & Background Customizer -->
+      <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-sm">
+        <i class="fa-solid fa-palette text-xs text-slate-500"></i>
+        <select id="select-ui-theme" class="bg-transparent text-xs text-slate-700 focus:outline-none cursor-pointer font-bold">
+          <option value="amber" class="bg-white text-slate-800">Sunny Sky</option>
+          <option value="emerald" class="bg-white text-slate-800">Fresh Mint</option>
+          <option value="indigo" class="bg-white text-slate-800">Vibrant Indigo</option>
+          <option value="purple" class="bg-white text-slate-800">Grape Soda</option>
+          <option value="rose" class="bg-white text-slate-800">Sunset Rose</option>
+        </select>
+      </div>
+
+      <!-- Toggle Contacts Hub -->
+      <button id="btn-toggle-sidebar" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-address-book theme-text"></i>
+        <span id="txt-toggle-sidebar">Hide Contacts</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 flex flex-col lg:flex-row h-[calc(100vh-73px)] overflow-hidden relative">
+
+    <!-- LANDING / ONBOARDING SCREEN -->
+    <div id="landing-screen" class="absolute inset-0 themed-bg-base z-40 flex items-center justify-center p-4 overflow-y-auto">
+      <div class="max-w-md w-full themed-bg-surface border themed-border-element rounded-3xl p-6 md:p-10 shadow-xl relative transition-all duration-300">
+        <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 theme-bg text-white w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg rotate-12 transition-all duration-300">
+          <i class="fa-solid fa-video text-3xl -rotate-12"></i>
+        </div>
+
+        <div class="text-center mt-10 mb-8">
+          <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight mb-2">Welcome to SafeCHAT+</h1>
+          <p class="text-slate-500 text-sm">A clean, bright space to meet new peers, chat, share your screen, and stay connected with safe contacts!</p>
+        </div>
+
+        <!-- Consent Checklist -->
+        <div class="space-y-3 mb-8">
+          <label class="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100 transition shadow-sm">
+            <input type="checkbox" id="consent-terms" class="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 bg-white border-slate-300">
+            <span class="text-xs md:text-sm text-slate-600 font-medium">I agree to be friendly, respectful, and keep this chat room positive.</span>
+          </label>
+        </div>
+
+        <!-- Start Action -->
+        <button id="btn-enter-chat" disabled class="w-full bg-slate-200 text-slate-400 font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 cursor-not-allowed">
+          <i class="fa-solid fa-comments text-lg"></i>
+          <span>Enter Chatroom</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- LEFT / MAIN PANEL: ACTIVE RANDOM CHAT & STREAMS -->
+    <div id="workspace-match" class="w-full lg:w-2/3 flex flex-col themed-bg-base border-r themed-border-element relative h-full transition-all duration-300">
+      
+      <!-- DEVICE SELECTOR & MEDIAL CONTROLS BAR -->
+      <div class="flex flex-wrap gap-4 px-4 py-3 themed-bg-surface border-b themed-border-element text-xs items-center justify-between transition-colors duration-300 shadow-sm">
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+            <i class="fa-solid fa-video theme-text transition-colors duration-300"></i>
+            <select id="select-video" class="bg-transparent font-bold focus:outline-none text-slate-700 max-w-[150px] sm:max-w-[190px] cursor-pointer"></select>
+          </div>
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+            <i class="fa-solid fa-microphone theme-text transition-colors duration-300"></i>
+            <select id="select-audio" class="bg-transparent font-bold focus:outline-none text-slate-700 max-w-[150px] sm:max-w-[190px] cursor-pointer"></select>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <button id="btn-toggle-mic" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl border border-slate-200 transition shadow-sm" title="Mute Mic">
+            <i id="icon-mic" class="fa-solid fa-microphone text-slate-600"></i>
+          </button>
+          <button id="btn-toggle-cam" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl border border-slate-200 transition shadow-sm" title="Toggle Cam">
+            <i id="icon-cam" class="fa-solid fa-video text-slate-600"></i>
+          </button>
+          <!-- Share Screen Button -->
+          <button id="btn-toggle-screen" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl border border-slate-200 transition flex items-center gap-1.5 font-bold shadow-sm" title="Share Screen">
+            <i id="icon-screen" class="fa-solid fa-desktop text-slate-600"></i>
+            <span class="hidden sm:inline text-[10px] text-slate-600" id="txt-screen-share">Share Screen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SIDE-BY-SIDE VIDEO VIEWPORTS -->
+      <div class="grid grid-cols-2 gap-4 p-4 themed-bg-base border-b themed-border-element">
+        
+        <!-- LOCAL VIDEO (YOU) -->
+        <div id="local-video-container" class="bg-white rounded-2xl overflow-hidden border border-slate-200 aspect-video flex items-center justify-center relative shadow-md">
+          <video id="local-video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100 hidden"></video>
+          
+          <div id="local-video-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-2 bg-slate-50">
+            <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-1">
+              <i class="fa-solid fa-video-slash text-base"></i>
+            </div>
+            <span class="text-xs font-bold text-slate-400">Stream Paused</span>
+          </div>
+
+          <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-slate-700 flex items-center gap-1.5 border border-slate-200 shadow-sm">
+            <span class="w-1.5 h-1.5 rounded-full theme-bg transition-colors duration-300"></span>
+            <span>YOU</span>
+          </div>
+        </div>
+
+        <!-- REMOTE VIDEO (STRANGER) -->
+        <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 aspect-video flex items-center justify-center relative shadow-md">
+          <video id="remote-video" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+          
+          <!-- Remote Video Overlay -->
+          <div id="remote-video-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-slate-50">
+            <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-2">
+              <i id="placeholder-avatar" class="fa-solid fa-user text-base"></i>
+            </div>
+            <h3 id="remote-placeholder-title" class="text-xs font-bold text-slate-500">Waiting for Stranger</h3>
+            <p id="remote-placeholder-desc" class="text-slate-400 text-[10px] hidden sm:block max-w-xs mt-0.5">Click "Find Match" to start.</p>
+          </div>
+
+          <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-slate-700 flex items-center gap-1.5 border border-slate-200 shadow-sm">
+            <span class="w-1.5 h-1.5 rounded-full theme-bg animate-pulse transition-colors duration-300"></span>
+            <span id="remote-identity-label">OFFLINE</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MATCH CONTROLS HEADER -->
+      <div class="themed-bg-surface p-3 border-b themed-border-element flex items-center justify-between gap-4 transition-colors duration-300 shadow-sm">
+        <div class="flex items-center gap-2">
+          <button id="btn-action" class="theme-bg theme-bg-hover text-white font-bold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition duration-200 text-sm shadow-md">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            <span id="txt-action">Find Match</span>
+          </button>
+          <button id="btn-stop" disabled class="bg-slate-100 text-slate-400 border border-slate-200 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition duration-200 text-sm cursor-not-allowed">
+            <i class="fa-solid fa-circle-stop"></i>
+            <span>Stop</span>
+          </button>
+        </div>
+
+        <!-- Add Friend trigger -->
+        <button id="btn-add-contact" class="hidden bg-slate-100 theme-text border border-slate-200 hover:theme-bg hover:text-white px-4 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-1.5 text-xs font-bold shadow-sm">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Add Friend</span>
+        </button>
+      </div>
+
+      <!-- CHAT COMPONENT DIRECTLY UNDER VIDEOS -->
+      <div id="chat-scroller-match" class="flex-1 p-4 overflow-y-auto space-y-4 themed-bg-base transition-colors duration-300">
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 max-w-sm mx-auto text-center space-y-2 shadow-sm">
+          <div class="inline-flex items-center justify-center w-7 h-7 rounded-full theme-bg-light theme-text border border-slate-200 mb-1 transition-all duration-300">
+            <i class="fa-solid fa-circle-info text-xs"></i>
+          </div>
+          <h4 class="font-bold text-slate-700 text-xs">Friendly Space</h4>
+          <p class="text-[11px] text-slate-500 leading-relaxed font-medium">
+            Connect safely to start sharing messages with real-time text chat.
+          </p>
+        </div>
+        <div id="match-messages" class="space-y-4"></div>
+        
+        <div id="typing-indicator-match" class="hidden flex items-center gap-3">
+          <div class="bg-white rounded-2xl px-4 py-2.5 text-xs text-slate-500 flex items-center gap-2 border border-slate-200 shadow-sm">
+            <span class="flex gap-1">
+              <span class="w-1.5 h-1.5 rounded-full theme-bg animate-bounce"></span>
+              <span class="w-1.5 h-1.5 rounded-full theme-bg animate-bounce [animation-delay:0.2s]"></span>
+              <span class="w-1.5 h-1.5 rounded-full theme-bg animate-bounce [animation-delay:0.4s]"></span>
+            </span>
+            <span>Stranger is typing...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCH TEXT INPUT -->
+      <div class="p-4 themed-bg-surface border-t themed-border-element transition-colors duration-300">
+        <form id="chat-form-match" class="flex gap-3">
+          <input type="text" id="chat-input-match" disabled placeholder="Find a random partner to start writing..." class="flex-1 bg-slate-50 text-slate-800 rounded-2xl px-5 py-3.5 border border-slate-200 focus:theme-border focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500/30 text-sm transition placeholder-slate-400 disabled:opacity-50">
+          <button type="submit" id="btn-send-match" disabled class="theme-bg theme-bg-hover text-white font-bold px-5 py-3.5 rounded-2xl transition flex items-center justify-center shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: SOCIAL/CONTACTS WORKSPACE (Collapsable) -->
+    <div id="right-contacts-panel" class="w-full lg:w-1/3 flex flex-col themed-bg-surface border-l themed-border-element h-full transition-all duration-300 overflow-hidden">
+      <div class="flex border-b border-slate-200 bg-slate-50">
+        <div class="flex-1 py-4 text-center font-bold text-sm theme-text flex items-center justify-center gap-2 border-b-2 theme-border transition-all duration-300">
+          <i class="fa-solid fa-address-book"></i> Contacts Hub
+        </div>
+      </div>
+
+      <!-- CONTACTS HUB WORKSPACE -->
+      <div id="workspace-contacts" class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- CONTACTS LIST VIEW -->
+        <div id="contacts-list-view" class="flex-1 flex flex-col h-full overflow-hidden">
+          <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+            <h3 class="font-bold text-xs tracking-wide text-slate-500 uppercase">My Friends</h3>
+            <span class="text-xs theme-text font-bold" id="contact-count">0 friends</span>
+          </div>
+
+          <div id="contacts-scroller" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- Dynamic contact cards get loaded here -->
+            <div id="empty-contacts-placeholder" class="text-center py-12 px-6 space-y-3">
+              <div class="text-slate-300 text-4xl"><i class="fa-solid fa-users"></i></div>
+              <h4 class="text-xs font-bold text-slate-500">No Friends Saved Yet</h4>
+              <p class="text-[11px] text-slate-400 max-w-xs mx-auto">Click "Add Friend" inside a live random match to save them so you can message or call them directly anytime!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIRECT PRIVATE CHAT VIEW -->
+        <div id="direct-chat-view" class="hidden flex-1 flex-col h-full themed-bg-surface overflow-hidden">
+          
+          <!-- Direct Chat Header -->
+          <div class="bg-slate-50 p-3 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <button id="btn-back-to-contacts" class="bg-white hover:bg-slate-100 p-2 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-800 transition shadow-sm">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+              </button>
+              <div>
+                <h4 id="direct-chat-title" class="font-bold text-xs text-slate-700">Contact Chat</h4>
+                <p class="text-[9px] text-emerald-400 font-semibold uppercase tracking-wider">Direct Message Session</p>
+              </div>
+            </div>
+            
+            <button id="btn-direct-call" class="theme-bg theme-bg-hover text-white px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
+              <i class="fa-solid fa-phone text-[10px]"></i> Direct Call
+            </button>
+          </div>
+
+          <!-- Direct Chat Messages Scroller -->
+          <div id="chat-scroller-direct" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
+            <div id="direct-messages" class="space-y-4"></div>
+          </div>
+
+          <!-- Direct Input Panel with Attachment Feature -->
+          <div class="p-3 bg-slate-50 border-t border-slate-200 flex flex-col gap-2">
+            
+            <!-- Attachment preview slot -->
+            <div id="attachment-preview" class="hidden flex items-center justify-between bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-file-arrow-up theme-text transition-colors duration-300"></i>
+                <div class="text-left text-[10px]">
+                  <span class="font-bold text-slate-700 block">Attachment Ready</span>
+                  <span id="attachment-preview-name" class="text-slate-400 block">image.jpg</span>
+                </div>
+              </div>
+              <button type="button" id="btn-remove-attachment" class="text-rose-500 hover:text-rose-600 text-[10px] px-2 font-bold">
+                <i class="fa-solid fa-trash-can mr-1"></i>Clear
+              </button>
+            </div>
+
+            <form id="chat-form-direct" class="flex items-center gap-2 relative">
+              <label class="bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 p-3.5 rounded-xl flex items-center justify-center cursor-pointer transition shadow-sm">
+                <i class="fa-solid fa-paperclip"></i>
+                <input type="file" id="direct-file-input" accept="image/*,video/*" class="hidden">
+              </label>
+
+              <input type="text" id="chat-input-direct" placeholder="Type direct message..." class="flex-1 bg-white text-slate-800 rounded-xl px-4 py-3.5 border border-slate-200 focus:theme-border focus:outline-none focus:ring-1 focus:ring-blue-500/30 text-xs transition placeholder-slate-400 shadow-sm">
+              <button type="submit" id="btn-send-direct" class="theme-bg theme-bg-hover text-white font-bold px-4.5 py-3.5 rounded-xl transition flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- CALL OVERLAYS & DIALOGS -->
+  <!-- 1. INCOMING CALL MODAL -->
+  <div id="incoming-call-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="max-w-xs w-full bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-2xl space-y-6">
+      <div class="w-16 h-16 rounded-full theme-bg-light theme-text border border-slate-250 flex items-center justify-center mx-auto animate-pulse transition-all duration-300 shadow-sm">
+        <i class="fa-solid fa-phone-volume text-2xl"></i>
+      </div>
+      <div>
+        <h4 class="font-extrabold text-base text-slate-800" id="incoming-caller-name">Someone</h4>
+        <p class="text-xs text-slate-500 mt-1">is calling you directly...</p>
+      </div>
+      <div class="flex gap-4">
+        <button id="btn-decline-call" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-1.5 shadow-md text-xs">
+          <i class="fa-solid fa-phone-slash"></i> Decline
+        </button>
+        <button id="btn-accept-call" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-1.5 shadow-md text-xs">
+          <i class="fa-solid fa-phone"></i> Accept
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. OUTGOING CALL MODAL -->
+  <div id="outgoing-call-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="max-w-xs w-full bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-2xl space-y-6">
+      <div class="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto animate-pulse">
+        <i class="fa-solid fa-phone text-xl text-slate-400"></i>
+      </div>
+      <div>
+        <h4 class="font-bold text-sm text-slate-800" id="outgoing-caller-title">Calling Contact...</h4>
+        <p class="text-xs text-slate-400 mt-1">Waiting for reply</p>
+      </div>
+      <button id="btn-cancel-outgoing" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-1.5 shadow-md text-xs">
+        <i class="fa-solid fa-phone-slash"></i> End Call
+      </button>
+    </div>
+  </div>
+
+  <!-- CUSTOM NOTIFICATION TOAST -->
+  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white border border-slate-200 text-slate-800 px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-2">
+    <i id="toast-icon" class="fa-solid fa-circle-check theme-text text-lg transition-all duration-300"></i>
+    <span id="toast-message" class="text-sm font-bold text-slate-700">Notification</span>
+  </div>
+
+  <!-- FIREBASE CONFIGURATION & SYSTEM WEBRTC CONTROLLER -->
+  <script type="module">
+    // Import modular Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc, 
+      updateDoc, 
+      deleteDoc, 
+      collection, 
+      getDocs, 
+      onSnapshot, 
+      arrayUnion 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Provided Web App Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCceMp0anYWwZfh-9LiWYSA5qeLl1OMsKo",
+      authDomain: "nsfwomegle18.firebaseapp.com",
+      projectId: "nsfwomegle18",
+      storageBucket: "nsfwomegle18.firebasestorage.app",
+      messagingSenderId: "613267864399",
+      appId: "1:613267864399:web:3831b8d1f9906c5306633a"
+    };
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'nsfwomegle18';
+    
+    // Initialize services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global Alert system (Declared globally at the very top of module scope)
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastIcon = document.getElementById('toast-icon');
+      const toastMessage = document.getElementById('toast-message');
+
+      if (!toast || !toastIcon || !toastMessage) return;
+
+      toastMessage.textContent = message;
+      if (type === 'error') {
+        toastIcon.className = "fa-solid fa-circle-exclamation text-rose-500 text-base";
+      } else if (type === 'success') {
+        toastIcon.className = "fa-solid fa-circle-check theme-text text-base";
+      } else {
+        toastIcon.className = "fa-solid fa-circle-info theme-text text-base";
+      }
+
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-2');
+      }, 4000);
+    }
+
+    // Dynamic wholesome animal name generator to personalize user experiences
+    const prefixes = ["Shiny", "Happy", "Kind", "Cool", "Cheerful", "Brave", "Joyful", "Swift", "Calm", "Gentle"];
+    const creatures = ["Panda", "Dolphin", "Koala", "Penguin", "Falcon", "Cheetah", "Gazelle", "Squirrel", "Beaver", "Otter"];
+    const randomProfileName = `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${creatures[Math.floor(Math.random() * creatures.length)]}`;
+
+    // App Global State
+    let userId = null;
+    let userName = randomProfileName;
+    let localStream = null;
+    let screenStream = null;
+    let isScreenSharing = false;
+    let pc = null;
+    let currentRoomId = null;
+    let activeMatchName = "Stranger";
+    
+    // Listeners
+    let roomUnsubscribe = null;
+    let queueUnsubscribe = null;
+    let matchCheckInterval = null;
+    let connectionRole = null; 
+    let peerId = null;
+    let isConnected = false;
+
+    // WebRTC Queue to handle incoming ICE candidates safely
+    let isRemoteDescriptionSet = false;
+    let iceCandidateQueue = [];
+
+    // Contact state trackers
+    let activeContactId = null;
+    let activeContactName = "";
+    let directRoomUnsubscribe = null;
+    let contactsListUnsubscribe = null;
+    let directRoomId = null;
+    let incomingCallUnsubscribe = null;
+    let currentCallStatusUnsubscribe = null;
+    
+    // Binary Attachment base64 data URL store
+    let attachedDataUrl = null;
+    let attachedFileName = "";
+    let attachedFileType = "";
+
+    // WebRTC Stun Configuration
+    const rtcConfig = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' }
+      ]
+    };
+
+    // DOM selectors
+    const landingScreen = document.getElementById('landing-screen');
+    const consentTerms = document.getElementById('consent-terms');
+    const btnEnterChat = document.getElementById('btn-enter-chat');
+    
+    const localVideo = document.getElementById('local-video');
+    const localVideoPlaceholder = document.getElementById('local-video-placeholder');
+    const remoteVideo = document.getElementById('remote-video');
+    const remoteVideoPlaceholder = document.getElementById('remote-video-placeholder');
+    const remotePlaceholderTitle = document.getElementById('remote-placeholder-title');
+    const remotePlaceholderDesc = document.getElementById('remote-placeholder-desc');
+    const remoteIdentityLabel = document.getElementById('remote-identity-label');
+    
+    const btnToggleMic = document.getElementById('btn-toggle-mic');
+    const iconMic = document.getElementById('icon-mic');
+    const btnToggleCam = document.getElementById('btn-toggle-cam');
+    const iconCam = document.getElementById('icon-cam');
+    const btnToggleScreen = document.getElementById('btn-toggle-screen');
+    const iconScreen = document.getElementById('icon-screen');
+
+    // Devices Selectors
+    const selectVideo = document.getElementById('select-video');
+    const selectAudio = document.getElementById('select-audio');
+    
+    // Match selectors
+    const btnAction = document.getElementById('btn-action');
+    const btnStop = document.getElementById('btn-stop');
+    const txtAction = document.getElementById('txt-action');
+    const btnAddContact = document.getElementById('btn-add-contact');
+    
+    // Scrollers & Inputs
+    const chatScrollerMatch = document.getElementById('chat-scroller-match');
+    const matchMessages = document.getElementById('match-messages');
+    const chatInputMatch = document.getElementById('chat-input-match');
+    const chatFormMatch = document.getElementById('chat-form-match');
+    const btnSendMatch = document.getElementById('btn-send-match');
+    const userStatusBadge = document.getElementById('user-status-badge');
+    const userProfileName = document.getElementById('user-profile-name');
+    const typingIndicatorMatch = document.getElementById('typing-indicator-match');
+
+    // Contacts hub selectors
+    const contactsListView = document.getElementById('contacts-list-view');
+    const contactsScroller = document.getElementById('contacts-scroller');
+    const emptyContactsPlaceholder = document.getElementById('empty-contacts-placeholder');
+    const contactCount = document.getElementById('contact-count');
+    
+    const directChatView = document.getElementById('direct-chat-view');
+    const btnBackToContacts = document.getElementById('btn-back-to-contacts');
+    const directChatTitle = document.getElementById('direct-chat-title');
+    const btnDirectCall = document.getElementById('btn-direct-call');
+    const chatScrollerDirect = document.getElementById('chat-scroller-direct');
+    const directMessages = document.getElementById('direct-messages');
+    const chatFormDirect = document.getElementById('chat-form-direct');
+    const chatInputDirect = document.getElementById('chat-input-direct');
+    const btnSendDirect = document.getElementById('btn-send-direct');
+    
+    const directFileInput = document.getElementById('direct-file-input');
+    const attachmentPreview = document.getElementById('attachment-preview');
+    const attachmentPreviewName = document.getElementById('attachment-preview-name');
+    const btnRemoveAttachment = document.getElementById('btn-remove-attachment');
+
+    // Call modals
+    const incomingCallModal = document.getElementById('incoming-call-modal');
+    const incomingCallerName = document.getElementById('incoming-caller-name');
+    const btnDeclineCall = document.getElementById('btn-decline-call');
+    const btnAcceptCall = document.getElementById('btn-accept-call');
+    
+    const outgoingCallModal = document.getElementById('outgoing-call-modal');
+    const outgoingCallerTitle = document.getElementById('outgoing-caller-title');
+    const btnCancelOutgoing = document.getElementById('btn-cancel-outgoing');
+
+    // Theme Customizer & Sidebar Selectors
+    const selectUiTheme = document.getElementById('select-ui-theme');
+    const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+    const txtToggleSidebar = document.getElementById('txt-toggle-sidebar');
+    const rightContactsPanel = document.getElementById('right-contacts-panel');
+    const workspaceMatchPanel = document.getElementById('workspace-match');
+
+    // UI Color Theme Config Mapping (Theme variables update the layout background completely)
+    const themes = {
+      amber: { primary: "#0284c7", hover: "#0369a1", light: "rgba(2, 132, 199, 0.1)", bgBase: "#f8fafc", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#e2e8f0" },
+      blue: { primary: "#2563eb", hover: "#1d4ed8", light: "rgba(37, 99, 235, 0.1)", bgBase: "#f0f4fe", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#cbd5e1" },
+      emerald: { primary: "#0d9488", hover: "#0f766e", light: "rgba(13, 148, 136, 0.1)", bgBase: "#f0fdfa", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#ccfbf1" },
+      indigo: { primary: "#6366f1", hover: "#4f46e5", light: "rgba(99, 102, 241, 0.1)", bgBase: "#f5f3ff", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#e0e7ff" },
+      purple: { primary: "#8b5cf6", hover: "#7c3aed", light: "rgba(139, 92, 246, 0.1)", bgBase: "#faf5ff", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#f3e8ff" },
+      rose: { primary: "#ec4899", hover: "#db2777", light: "rgba(236, 72, 153, 0.1)", bgBase: "#fff1f2", bgSurface: "#ffffff", bgHeader: "#ffffff", border: "#fce7f3" }
+    };
+
+    // Change Accent and Background Theme dynamically
+    selectUiTheme.addEventListener('change', (e) => {
+      const selected = themes[e.target.value] || themes.amber;
+      const themeStyleBlock = document.getElementById('dynamic-theme');
+      
+      themeStyleBlock.innerHTML = `
+        :root {
+          --color-primary: ${selected.primary};
+          --color-primary-hover: ${selected.hover};
+          --color-primary-light: ${selected.light};
+          --color-bg-base: ${selected.bgBase};
+          --color-bg-surface: ${selected.bgSurface};
+          --color-bg-header: ${selected.bgHeader};
+          --color-border: ${selected.border};
+        }
+        .themed-bg-base { background-color: var(--color-bg-base) !important; }
+        .themed-bg-surface { background-color: var(--color-bg-surface) !important; }
+        .themed-bg-header { background-color: var(--color-bg-header) !important; }
+        .themed-border-element { border-color: var(--color-border) !important; }
+        
+        .theme-bg { background-color: var(--color-primary) !important; }
+        .theme-bg-hover:hover { background-color: var(--color-primary-hover) !important; }
+        .theme-text { color: var(--color-primary) !important; }
+        .theme-border { border-color: var(--color-primary) !important; }
+        .theme-bg-light { background-color: var(--color-primary-light) !important; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+          width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+          background: var(--color-bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+          background: var(--color-border);
+          border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: var(--color-primary);
+        }
+      `;
+      showToast(`Theme updated to ${e.target.options[e.target.selectedIndex].text}!`);
+    });
+
+    // Sidebar Collapsing toggle
+    btnToggleSidebar.addEventListener('click', () => {
+      const isHidden = rightContactsPanel.classList.contains('hidden');
+      if (isHidden) {
+        // Expand
+        rightContactsPanel.classList.remove('hidden');
+        workspaceMatchPanel.className = "w-full lg:w-2/3 flex flex-col themed-bg-base border-r themed-border-element relative h-full transition-all duration-300";
+        txtToggleSidebar.textContent = "Hide Contacts";
+        showToast("Contacts Hub visible");
+      } else {
+        // Collapse
+        rightContactsPanel.classList.add('hidden');
+        workspaceMatchPanel.className = "w-full lg:w-full flex flex-col themed-bg-base relative h-full transition-all duration-300";
+        txtToggleSidebar.textContent = "Show Contacts";
+        showToast("Contacts Hub collapsed");
+      }
+    });
+
+    // Initialize Auth (Rule 3 + Custom Token Priority with Safe Fallback for mismatch)
+    async function initAuthentication() {
+      try {
+        let userCredential = null;
+        
+        // Custom token prioritized, securely falling back to anonymous on failure
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          try {
+            userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+            console.log("Logged in with custom token:", userCredential.user.uid);
+          } catch (tokenErr) {
+            console.warn("Custom token authentication failed. Falling back to anonymous sign-in:", tokenErr);
+            userCredential = await signInAnonymously(auth);
+          }
+        } else {
+          userCredential = await signInAnonymously(auth);
+        }
+        
+        userId = userCredential.user.uid;
+        userStatusBadge.textContent = "Online";
+        userProfileName.textContent = `You: ${userName}`;
+        userProfileName.classList.remove('hidden');
+        console.log("Logged in authenticated user ID as:", userId, userName);
+
+        // Initialize personal contacts stream listener
+        initContactsStream();
+
+        // Listen for direct inbound call invitations
+        initInboundCallStream();
+
+      } catch (err) {
+        console.error("Auth failed completely:", err);
+        showToast("Authentication failed. Please reload.", "error");
+        userStatusBadge.textContent = "Offline";
+      }
+    }
+
+    // Load available camera and microphone devices
+    async function loadMediaDevices() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        
+        selectVideo.innerHTML = "";
+        selectAudio.innerHTML = "";
+
+        let videoCount = 0;
+        let audioCount = 0;
+
+        devices.forEach(device => {
+          const option = document.createElement('option');
+          option.value = device.deviceId;
+          
+          if (device.kind === 'videoinput') {
+            videoCount++;
+            option.text = device.label || `Camera ${videoCount}`;
+            selectVideo.appendChild(option);
+          } else if (device.kind === 'audioinput') {
+            audioCount++;
+            option.text = device.label || `Microphone ${audioCount}`;
+            selectAudio.appendChild(option);
+          }
+        });
+
+        if (videoCount === 0) {
+          const opt = document.createElement('option');
+          opt.text = "No Camera Found";
+          selectVideo.appendChild(opt);
+        }
+        if (audioCount === 0) {
+          const opt = document.createElement('option');
+          opt.text = "No Mic Found";
+          selectAudio.appendChild(opt);
+        }
+      } catch (err) {
+        console.warn("Device enumeration failed:", err);
+      }
+    }
+
+    // Activate Media Streams
+    async function initMedia() {
+      try {
+        const videoSource = selectVideo.value;
+        const audioSource = selectAudio.value;
+
+        const constraints = {
+          video: videoSource ? { deviceId: { exact: videoSource }, width: 640, height: 480, facingMode: "user" } : true,
+          audio: audioSource ? { deviceId: { exact: audioSource } } : true
+        };
+
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        localVideo.srcObject = localStream;
+        localVideo.classList.remove('hidden');
+        localVideoPlaceholder.classList.add('hidden');
+
+        // Populate and update selectable list
+        await loadMediaDevices();
+      } catch (err) {
+        console.warn("Camera/Mic stream block warning:", err);
+        showToast("Webcam/Audio device inaccessible.", "error");
+      }
+    }
+
+    // Dynamic Device Switching Logic (Replacing active track mid-call)
+    async function switchMediaDevices() {
+      if (!localStream) return;
+
+      const videoSource = selectVideo.value;
+      const audioSource = selectAudio.value;
+
+      const constraints = {
+        video: videoSource ? { deviceId: { exact: videoSource }, width: 640, height: 480 } : true,
+        audio: audioSource ? { deviceId: { exact: audioSource } } : true
+      };
+
+      try {
+        // Stop currently active tracks
+        localStream.getTracks().forEach(track => track.stop());
+
+        // Get new stream with chosen devices
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        // If not currently screen sharing, update the video element view
+        if (!isScreenSharing) {
+          localVideo.srcObject = localStream;
+        }
+
+        // If active WebRTC peer connection exists, update active stream tracks seamlessly
+        if (pc) {
+          const videoTrack = isScreenSharing ? screenStream.getVideoTracks()[0] : localStream.getVideoTracks()[0];
+          const audioTrack = localStream.getAudioTracks()[0];
+
+          const senders = pc.getSenders();
+          const videoSender = senders.find(sender => sender.track && sender.track.kind === 'video');
+          const audioSender = senders.find(sender => sender.track && sender.track.kind === 'audio');
+
+          if (videoSender && videoTrack) {
+            await videoSender.replaceTrack(videoTrack);
+          }
+          if (audioSender && audioTrack) {
+            await audioSender.replaceTrack(audioTrack);
+          }
+        }
+        showToast("Media input devices updated!");
+      } catch (err) {
+        console.error("Device swap failed:", err);
+        showToast("Error switching media devices.", "error");
+      }
+    }
+
+    selectVideo.addEventListener('change', switchMediaDevices);
+    selectAudio.addEventListener('change', switchMediaDevices);
+
+    // Dynamic Screen Sharing Engine (Fixed & fully operational)
+    async function toggleScreenShare() {
+      if (!isScreenSharing) {
+        try {
+          screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+            video: {
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              frameRate: { ideal: 15 } // Optimized framerate for readable stream capture
+            } 
+          });
+          const screenTrack = screenStream.getVideoTracks()[0];
+
+          // Swap local preview viewport to the screen projection
+          localVideo.srcObject = screenStream;
+          localVideo.classList.remove('hidden');
+          localVideoPlaceholder.classList.add('hidden');
+
+          // If active WebRTC peer connection exists, replace the current video track with screen track
+          if (pc) {
+            const senders = pc.getSenders();
+            const videoSender = senders.find(sender => sender.track && sender.track.kind === 'video');
+            if (videoSender) {
+              await videoSender.replaceTrack(screenTrack);
+            } else {
+              // If there was no active video track, add it to the peer connection
+              pc.addTrack(screenTrack, screenStream);
+            }
+          }
+
+          // Track physical browser "Stop Sharing" overlay clicks
+          screenTrack.onended = () => {
+            stopScreenShare();
+          };
+
+          isScreenSharing = true;
+
+          // Update toggle button presentation to active sharing state
+          btnToggleScreen.classList.remove('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+          btnToggleScreen.classList.add('bg-red-500', 'text-white', 'hover:bg-red-600');
+          iconScreen.className = "fa-solid fa-desktop text-white animate-pulse";
+          
+          showToast("Screen sharing started!", "success");
+        } catch (err) {
+          console.warn("Screen share session canceled or failed:", err);
+          showToast("Screen sharing was not started.", "info");
+        }
+      } else {
+        await stopScreenShare();
+      }
+    }
+
+    async function stopScreenShare() {
+      if (!isScreenSharing) return;
+
+      if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+        screenStream = null;
+      }
+
+      const webcamTrack = localStream ? localStream.getVideoTracks()[0] : null;
+      
+      if (webcamTrack) {
+        localVideo.srcObject = localStream;
+        if (pc) {
+          const senders = pc.getSenders();
+          const videoSender = senders.find(sender => sender.track && sender.track.kind === 'video');
+          if (videoSender) {
+            await videoSender.replaceTrack(webcamTrack);
+          }
+        }
+      } else {
+        localVideo.srcObject = null;
+        localVideo.classList.add('hidden');
+        localVideoPlaceholder.classList.remove('hidden');
+        
+        if (pc) {
+          const senders = pc.getSenders();
+          const videoSender = senders.find(sender => sender.track && sender.track.kind === 'video');
+          if (videoSender) {
+            await videoSender.replaceTrack(null);
+          }
+        }
+      }
+
+      isScreenSharing = false;
+
+      // Reset button layout style to clean base state
+      btnToggleScreen.classList.add('bg-slate-100', 'text-slate-700', 'hover:bg-slate-200');
+      btnToggleScreen.classList.remove('bg-red-500', 'text-white', 'hover:bg-red-600');
+      iconScreen.className = "fa-solid fa-desktop text-slate-600";
+      
+      showToast("Screen sharing stopped.");
+    }
+
+    btnToggleScreen.addEventListener('click', toggleScreenShare);
+
+    // Toggle tracks locally
+    btnToggleMic.addEventListener('click', () => {
+      if (localStream) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        if (audioTrack) {
+          audioTrack.enabled = !audioTrack.enabled;
+          iconMic.className = audioTrack.enabled ? "fa-solid fa-microphone" : "fa-solid fa-microphone-slash text-rose-500";
+          showToast(audioTrack.enabled ? "Microphone active" : "Microphone muted");
+        }
+      }
+    });
+
+    btnToggleCam.addEventListener('click', () => {
+      if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+          videoTrack.enabled = !videoTrack.enabled;
+          iconCam.className = videoTrack.enabled ? "fa-solid fa-video" : "fa-solid fa-video-slash text-rose-500";
+          showToast(videoTrack.enabled ? "Webcam active" : "Webcam muted");
+        }
+      }
+    });
+
+    // Landing Screen Agreement validation
+    consentTerms.addEventListener('change', () => {
+      if (consentTerms.checked) {
+        btnEnterChat.removeAttribute('disabled');
+        btnEnterChat.className = "w-full theme-bg theme-bg-hover text-white font-black py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md";
+      } else {
+        btnEnterChat.setAttribute('disabled', 'true');
+        btnEnterChat.className = "w-full bg-slate-200 text-slate-400 font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 cursor-not-allowed";
+      }
+    });
+
+    btnEnterChat.addEventListener('click', async () => {
+      landingScreen.classList.add('hidden');
+      await initMedia();
+    });
+
+    // ----------------------------------------------------
+    // RANDOM MATCHMAKING ENGINE
+    // ----------------------------------------------------
+    async function startMatchmaking() {
+      if (!userId) return;
+
+      await cleanupRoomState();
+      
+      isConnected = false;
+      txtAction.textContent = "Finding match...";
+      btnAction.disabled = true;
+      btnStop.disabled = false;
+      btnStop.classList.remove('cursor-not-allowed', 'text-slate-500');
+      btnStop.classList.add('text-rose-500', 'border-rose-500/20');
+      btnAddContact.classList.add('hidden');
+      
+      remotePlaceholderTitle.textContent = "Searching Room";
+      remotePlaceholderDesc.textContent = "Looking for an active chat companion...";
+      addSystemMessage("Searching for safe chat buddies... Ready to connect.");
+
+      // Register self inside Match Queue (Strict Rule 1 public directory)
+      const queueDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', userId);
+      await setDoc(queueDocRef, {
+        uid: userId,
+        name: userName,
+        status: 'searching',
+        pairedWith: null,
+        timestamp: Date.now()
+      });
+
+      const queueCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'queue');
+      
+      // Callee Queue Listener
+      queueUnsubscribe = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'queue', userId), async (snapshot) => {
+        const data = snapshot.data();
+        if (data && data.pairedWith && data.status === 'matched' && !isConnected) {
+          isConnected = true;
+          peerId = data.pairedWith;
+          connectionRole = 'callee';
+          currentRoomId = [userId, peerId].sort().join('_');
+          await runCalleeSignaling(currentRoomId);
+        }
+      }, (err) => {
+        console.error("Queue state track error:", err);
+      });
+
+      // Caller Matchmaking loop
+      matchCheckInterval = setInterval(async () => {
+        if (isConnected) return;
+
+        try {
+          // Rule 2: Fetch collection simply, filter inside memory
+          const querySnapshot = await getDocs(queueCollectionRef);
+          let potentialMatches = [];
+          
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.uid !== userId && data.status === 'searching' && !data.pairedWith) {
+              potentialMatches.push(data);
+            }
+          });
+
+          potentialMatches.sort((a, b) => a.timestamp - b.timestamp);
+
+          if (potentialMatches.length > 0) {
+            const targetPeer = potentialMatches[0];
+            
+            if (userId < targetPeer.uid) {
+              clearInterval(matchCheckInterval);
+              
+              peerId = targetPeer.uid;
+              activeMatchName = targetPeer.name || "Stranger";
+              connectionRole = 'caller';
+              currentRoomId = `${userId}_${peerId}`;
+              isConnected = true;
+
+              const peerDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', peerId);
+              await updateDoc(queueDocRef, { pairedWith: peerId, status: 'matched' });
+              await updateDoc(peerDocRef, { pairedWith: userId, status: 'matched' });
+
+              await runCallerSignaling(currentRoomId);
+            }
+          }
+        } catch (err) {
+          console.error("Match interval search error:", err);
+        }
+      }, 2500);
+    }
+
+    // Safely add ICE Candidates once Remote Description is fully verified
+    function handleIceCandidateSafely(candidate) {
+      if (isRemoteDescriptionSet && pc) {
+        pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {
+          console.warn("Error adding queued ICE Candidate:", e);
+        });
+      } else {
+        iceCandidateQueue.push(candidate);
+      }
+    }
+
+    // Process and flush all candidate buffers
+    function flushIceCandidatesQueue() {
+      if (!pc) return;
+      console.log(`Flushing ICE Candidate queue containing ${iceCandidateQueue.length} entries.`);
+      iceCandidateQueue.forEach(candidate => {
+        pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => {
+          console.warn("Failed executing deferred ICE candidate load:", e);
+        });
+      });
+      iceCandidateQueue = [];
+    }
+
+    async function runCallerSignaling(roomId) {
+      addSystemMessage("Peer matching confirmed...");
+      
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', roomId);
+      pc = new RTCPeerConnection(rtcConfig);
+      isRemoteDescriptionSet = false;
+      iceCandidateQueue = [];
+
+      // Stream either screen shares or standard webcams
+      const activeVideoTrack = isScreenSharing && screenStream ? screenStream.getVideoTracks()[0] : (localStream ? localStream.getVideoTracks()[0] : null);
+      const activeAudioTrack = localStream ? localStream.getAudioTracks()[0] : null;
+
+      if (activeVideoTrack) pc.addTrack(activeVideoTrack, localStream || screenStream);
+      if (activeAudioTrack) pc.addTrack(activeAudioTrack, localStream);
+
+      pc.onicecandidate = async (event) => {
+        if (event.candidate) {
+          await updateDoc(roomRef, {
+            callerCandidates: arrayUnion(event.candidate.toJSON())
+          });
+        }
+      };
+
+      pc.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        remoteVideo.classList.remove('hidden');
+        remoteVideoPlaceholder.classList.add('hidden');
+        remoteIdentityLabel.textContent = `CONNECTED TO ${activeMatchName.toUpperCase()}`;
+      };
+
+      const offerDescription = await pc.createOffer();
+      await pc.setLocalDescription(offerDescription);
+
+      const roomPayload = {
+        offer: {
+          sdp: offerDescription.sdp,
+          type: offerDescription.type
+        },
+        callerName: userName,
+        status: 'connecting',
+        messages: [],
+        callerCandidates: [],
+        calleeCandidates: [],
+        typing: { caller: false, callee: false }
+      };
+
+      await setDoc(roomRef, roomPayload);
+
+      roomUnsubscribe = onSnapshot(roomRef, async (snapshot) => {
+        const data = snapshot.data();
+        if (!data) return;
+
+        activeMatchName = data.calleeName || "Stranger";
+        remoteIdentityLabel.textContent = `CONNECTED TO ${activeMatchName.toUpperCase()}`;
+
+        if (data.answer && !pc.currentRemoteDescription) {
+          const answerDescription = new RTCSessionDescription(data.answer);
+          await pc.setRemoteDescription(answerDescription);
+          isRemoteDescriptionSet = true;
+          flushIceCandidatesQueue();
+          
+          addSystemMessage(`Connected to ${activeMatchName}!`);
+          unlockChatInputs();
+          btnAddContact.classList.remove('hidden');
+        }
+
+        // Process callee candidates through safety wrapper
+        if (data.calleeCandidates && data.calleeCandidates.length > 0) {
+          data.calleeCandidates.forEach(cand => {
+            handleIceCandidateSafely(cand);
+          });
+        }
+
+        if (data.status === 'disconnected') {
+          handlePeerExit();
+        }
+
+        renderMessages(data.messages || [], matchMessages, chatScrollerMatch);
+        updateTypingIndicator(data.typing, typingIndicatorMatch);
+      }, (err) => {
+        console.error("Signaling channel error:", err);
+      });
+    }
+
+    async function runCalleeSignaling(roomId) {
+      addSystemMessage("Peer matching confirmed...");
+
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', roomId);
+      pc = new RTCPeerConnection(rtcConfig);
+      isRemoteDescriptionSet = false;
+      iceCandidateQueue = [];
+
+      // Stream either screen shares or standard webcams
+      const activeVideoTrack = isScreenSharing && screenStream ? screenStream.getVideoTracks()[0] : (localStream ? localStream.getVideoTracks()[0] : null);
+      const activeAudioTrack = localStream ? localStream.getAudioTracks()[0] : null;
+
+      if (activeVideoTrack) pc.addTrack(activeVideoTrack, localStream || screenStream);
+      if (activeAudioTrack) pc.addTrack(activeAudioTrack, localStream);
+
+      pc.onicecandidate = async (event) => {
+        if (event.candidate) {
+          await updateDoc(roomRef, {
+            calleeCandidates: arrayUnion(event.candidate.toJSON())
+          });
+        }
+      };
+
+      pc.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        remoteVideo.classList.remove('hidden');
+        remoteVideoPlaceholder.classList.add('hidden');
+      };
+
+      roomUnsubscribe = onSnapshot(roomRef, async (snapshot) => {
+        const data = snapshot.data();
+        if (!data) return;
+
+        activeMatchName = data.callerName || "Stranger";
+        remoteIdentityLabel.textContent = `CONNECTED TO ${activeMatchName.toUpperCase()}`;
+
+        if (data.offer && !pc.currentRemoteDescription) {
+          const offerDescription = new RTCSessionDescription(data.offer);
+          await pc.setRemoteDescription(offerDescription);
+          isRemoteDescriptionSet = true;
+          flushIceCandidatesQueue();
+
+          const answerDescription = await pc.createAnswer();
+          await pc.setLocalDescription(answerDescription);
+
+          await updateDoc(roomRef, {
+            answer: {
+              sdp: answerDescription.sdp,
+              type: answerDescription.type
+            },
+            calleeName: userName,
+            status: 'connected'
+          });
+          
+          addSystemMessage(`Connected to ${activeMatchName}!`);
+          unlockChatInputs();
+          btnAddContact.classList.remove('hidden');
+        }
+
+        // Process caller candidates through safety wrapper
+        if (data.callerCandidates && data.callerCandidates.length > 0) {
+          data.callerCandidates.forEach(cand => {
+            handleIceCandidateSafely(cand);
+          });
+        }
+
+        if (data.status === 'disconnected') {
+          handlePeerExit();
+        }
+
+        renderMessages(data.messages || [], matchMessages, chatScrollerMatch);
+        updateTypingIndicator(data.typing, typingIndicatorMatch);
+      }, (err) => {
+        console.error("Signaling channel error:", err);
+      });
+    }
+
+    // ----------------------------------------------------
+    // PERSISTENT CONTACTS SYSTEM (Saves to Public Directory, Filtered in JS)
+    // ----------------------------------------------------
+
+    // Write contact inside public workspace (Rule 1 & Rule 3 Gated path)
+    btnAddContact.addEventListener('click', async () => {
+      if (!userId || !peerId) return;
+      try {
+        const myContactId = `${userId}_${peerId}`;
+        const myContactRef = doc(db, 'artifacts', appId, 'public', 'data', 'contacts', myContactId);
+        await setDoc(myContactRef, {
+          id: myContactId,
+          ownerId: userId,
+          contactId: peerId,
+          contactName: activeMatchName,
+          addedAt: Date.now()
+        });
+
+        const peerContactId = `${peerId}_${userId}`;
+        const peerContactRef = doc(db, 'artifacts', appId, 'public', 'data', 'contacts', peerContactId);
+        await setDoc(peerContactRef, {
+          id: peerContactId,
+          ownerId: peerId,
+          contactId: userId,
+          contactName: userName,
+          addedAt: Date.now()
+        });
+
+        showToast(`${activeMatchName} was added to contacts! Check the Contacts Hub.`, 'success');
+        btnAddContact.classList.add('hidden');
+      } catch (err) {
+        console.error("Failed adding contact:", err);
+        showToast("Failed to save contact. Please try again.", "error");
+      }
+    });
+
+    // Real-time listener for current user's contact entries (Rule 2 filter in-memory)
+    function initContactsStream() {
+      if (!userId) return;
+
+      const contactsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'contacts');
+      contactsListUnsubscribe = onSnapshot(contactsColRef, (snapshot) => {
+        contactsScroller.innerHTML = "";
+        let count = 0;
+
+        snapshot.forEach((doc) => {
+          const contact = doc.data();
+          if (contact.ownerId === userId) {
+            count++;
+            renderContactCard(contact);
+          }
+        });
+
+        contactCount.textContent = `${count} ${count === 1 ? 'friend' : 'friends'}`;
+
+        if (count > 0) {
+          emptyContactsPlaceholder.classList.add('hidden');
+        } else {
+          emptyContactsPlaceholder.classList.remove('hidden');
+        }
+      }, (err) => {
+        console.error("Failed reading contacts stream:", err);
+      });
+    }
+
+    // Render Contact card template
+    function renderContactCard(contact) {
+      const card = document.createElement('div');
+      card.className = "bg-white p-4 rounded-2xl border border-slate-200 flex items-center justify-between gap-4 transition hover:border-slate-300 shadow-sm";
+      card.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center theme-text font-bold uppercase text-sm">
+            ${contact.contactName.charAt(0)}
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm">${contact.contactName}</h4>
+            <p class="text-[10px] text-slate-500">SafeCHAT+ Friend</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn-chat-contact bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs transition flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-message text-slate-500"></i> Chat
+          </button>
+          <button class="btn-call-contact bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-2 rounded-xl text-xs transition flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-phone text-slate-500"></i> Call
+          </button>
+        </div>
+      `;
+
+      // Bind actions on dynamic buttons
+      card.querySelector('.btn-chat-contact').addEventListener('click', () => {
+        openDirectMessageChat(contact.contactId, contact.contactName);
+      });
+
+      card.querySelector('.btn-call-contact').addEventListener('click', () => {
+        initiateDirectCall(contact.contactId, contact.contactName);
+      });
+
+      contactsScroller.appendChild(card);
+    }
+
+    // Switch view to specific direct message log
+    async function openDirectMessageChat(contactId, name) {
+      activeContactId = contactId;
+      activeContactName = name;
+      
+      directChatTitle.textContent = name;
+      
+      // Compute deterministic sorted room ID
+      directRoomId = `direct_${[userId, contactId].sort().join('_')}`;
+
+      // Show Chat panel, hide list
+      contactsListView.classList.add('hidden');
+      directChatView.classList.remove('hidden');
+
+      // Unsubscribe existing message listener if active
+      if (directRoomUnsubscribe) directRoomUnsubscribe();
+
+      // Listen to Direct Chat Room (Rule 1 public directory)
+      const directRoomRef = doc(db, 'artifacts', appId, 'public', 'data', 'direct_chats', directRoomId);
+      
+      directRoomUnsubscribe = onSnapshot(directRoomRef, (snapshot) => {
+        const data = snapshot.data();
+        if (data) {
+          renderMessages(data.messages || [], directMessages, chatScrollerDirect);
+        } else {
+          // Initialize empty message array if room doc doesn't exist yet
+          setDoc(directRoomRef, { messages: [], members: [userId, contactId] });
+        }
+      }, (err) => {
+        console.error("Failed loading DMs:", err);
+      });
+    }
+
+    // Go back to list
+    btnBackToContacts.addEventListener('click', () => {
+      directChatView.classList.add('hidden');
+      contactsListView.classList.remove('hidden');
+      if (directRoomUnsubscribe) {
+        directRoomUnsubscribe();
+        directRoomUnsubscribe = null;
+      }
+      activeContactId = null;
+      directRoomId = null;
+    });
+
+    // ----------------------------------------------------
+    // IN-CHAT FILE ATTACHMENTS (Pictures & Videos)
+    // ----------------------------------------------------
+
+    // File selection triggers Base64 Conversion
+    directFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 500 * 1024) {
+        showToast("Attachments must be under 500KB to stay optimized.", "error");
+        directFileInput.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        attachedDataUrl = event.target.result;
+        attachedFileName = file.name;
+        attachedFileType = file.type;
+
+        // Display small attachment panel preview UI
+        attachmentPreviewName.textContent = `${file.name} (${Math.round(file.size/1024)} KB)`;
+        attachmentPreview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Remove Attachment draft
+    btnRemoveAttachment.addEventListener('click', () => {
+      attachedDataUrl = null;
+      attachedFileName = "";
+      attachedFileType = "";
+      directFileInput.value = "";
+      attachmentPreview.classList.add('hidden');
+    });
+
+    // Send direct message
+    chatFormDirect.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const text = chatInputDirect.value.trim();
+      if (!text && !attachedDataUrl) return;
+
+      if (!directRoomId) return;
+
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'direct_chats', directRoomId);
+      
+      const newMsg = {
+        sender: userId,
+        text: text,
+        timestamp: Date.now()
+      };
+
+      // Incorporate attachment parameters if available
+      if (attachedDataUrl) {
+        newMsg.attachment = {
+          data: attachedDataUrl,
+          name: attachedFileName,
+          type: attachedFileType
+        };
+      }
+
+      try {
+        await updateDoc(roomRef, {
+          messages: arrayUnion(newMsg)
+        });
+
+        // Clean input & preview draft elements
+        chatInputDirect.value = '';
+        attachedDataUrl = null;
+        attachedFileName = "";
+        attachedFileType = "";
+        directFileInput.value = "";
+        attachmentPreview.classList.add('hidden');
+      } catch (err) {
+        console.error("Direct Message transmission error:", err);
+      }
+    });
+
+    // ----------------------------------------------------
+    // DIRECT P2P CALLING SYSTEM (Calling saved contacts)
+    // ----------------------------------------------------
+
+    // Initiate Call Invitation to Contact
+    async function initiateDirectCall(contactId, name) {
+      if (!userId || !contactId) return;
+
+      // Ensure local media is initialized
+      if (!localStream) {
+        await initMedia();
+      }
+
+      peerId = contactId;
+      activeMatchName = name;
+
+      outgoingCallerTitle.textContent = `Calling ${name}...`;
+      outgoingCallModal.classList.remove('hidden');
+
+      // Create peer connection
+      pc = new RTCPeerConnection(rtcConfig);
+      isRemoteDescriptionSet = false;
+      iceCandidateQueue = [];
+      
+      // Stream either screen shares or standard webcams
+      const activeVideoTrack = isScreenSharing && screenStream ? screenStream.getVideoTracks()[0] : (localStream ? localStream.getVideoTracks()[0] : null);
+      const activeAudioTrack = localStream ? localStream.getAudioTracks()[0] : null;
+
+      if (activeVideoTrack) pc.addTrack(activeVideoTrack, localStream || screenStream);
+      if (activeAudioTrack) pc.addTrack(activeAudioTrack, localStream);
+
+      // Outgoing Signaling logic writes call invite document into peer's mailbox collection (Rule 1)
+      const callRef = doc(db, 'artifacts', appId, 'public', 'data', 'calls', contactId);
+
+      pc.onicecandidate = async (event) => {
+        if (event.candidate) {
+          await updateDoc(callRef, {
+            callerCandidates: arrayUnion(event.candidate.toJSON())
+          });
+        }
+      };
+
+      pc.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        remoteVideo.classList.remove('hidden');
+        remoteVideoPlaceholder.classList.add('hidden');
+        remoteIdentityLabel.textContent = `LIVE WITH ${name.toUpperCase()}`;
+      };
+
+      const offerDescription = await pc.createOffer();
+      await pc.setLocalDescription(offerDescription);
+
+      // Write direct invitation offer
+      await setDoc(callRef, {
+        callerId: userId,
+        callerName: userName,
+        status: 'ringing',
+        offer: {
+          sdp: offerDescription.sdp,
+          type: offerDescription.type
+        },
+        callerCandidates: [],
+        calleeCandidates: []
+      });
+
+      // Listen for receiver's reply & accepted answer on current mailbox
+      currentCallStatusUnsubscribe = onSnapshot(callRef, async (snapshot) => {
+        const data = snapshot.data();
+        if (!data) return;
+
+        // Cancel / Rejected/ Ended Call
+        if (data.status === 'declined' || data.status === 'ended') {
+          showToast(`Call was declined or ended.`, 'error');
+          stopDirectCall();
+        }
+
+        // Callee accepted: Process SDP Answer
+        if (data.status === 'accepted' && data.answer && !pc.currentRemoteDescription) {
+          const answerDescription = new RTCSessionDescription(data.answer);
+          await pc.setRemoteDescription(answerDescription);
+          isRemoteDescriptionSet = true;
+          flushIceCandidatesQueue();
+          
+          outgoingCallModal.classList.add('hidden');
+          showToast(`Call connected with ${name}!`, 'success');
+        }
+
+        // Load callee Ice candidates
+        if (data.calleeCandidates && data.calleeCandidates.length > 0) {
+          data.calleeCandidates.forEach(cand => {
+            handleIceCandidateSafely(cand);
+          });
+        }
+      }, (err) => {
+        console.error("Direct call session monitor failed:", err);
+      });
+    }
+
+    // Direct caller button inside DM interface helper
+    btnDirectCall.addEventListener('click', () => {
+      if (activeContactId && activeContactName) {
+        initiateDirectCall(activeContactId, activeContactName);
+      }
+    });
+
+    // Inbound Call listener monitor
+    function initInboundCallStream() {
+      if (!userId) return;
+
+      const myCallInboxRef = doc(db, 'artifacts', appId, 'public', 'data', 'calls', userId);
+      
+      incomingCallUnsubscribe = onSnapshot(myCallInboxRef, async (snapshot) => {
+        const data = snapshot.data();
+        if (data && data.status === 'ringing') {
+          // Store caller identification references
+          peerId = data.callerId;
+          activeMatchName = data.callerName;
+
+          incomingCallerName.textContent = data.callerName;
+          incomingCallModal.classList.remove('hidden');
+        } else if (data && data.status === 'ended') {
+          incomingCallModal.classList.add('hidden');
+          stopDirectCall();
+        }
+      }, (err) => {
+        console.error("Call inbox listener failure:", err);
+      });
+    }
+
+    // Accept Incoming Direct Invitation
+    btnAcceptCall.addEventListener('click', async () => {
+      if (!userId || !peerId) return;
+
+      incomingCallModal.classList.add('hidden');
+
+      // Ensure local stream is running
+      if (!localStream) {
+        await initMedia();
+      }
+
+      // Establish Peer connection on Callee's end
+      pc = new RTCPeerConnection(rtcConfig);
+      isRemoteDescriptionSet = false;
+      iceCandidateQueue = [];
+
+      // Stream either screen shares or standard webcams
+      const activeVideoTrack = isScreenSharing && screenStream ? screenStream.getVideoTracks()[0] : (localStream ? localStream.getVideoTracks()[0] : null);
+      const activeAudioTrack = localStream ? localStream.getAudioTracks()[0] : null;
+
+      if (activeVideoTrack) pc.addTrack(activeVideoTrack, localStream || screenStream);
+      if (activeAudioTrack) pc.addTrack(activeAudioTrack, localStream);
+
+      const myCallInboxRef = doc(db, 'artifacts', appId, 'public', 'data', 'calls', userId);
+
+      pc.onicecandidate = async (event) => {
+        if (event.candidate) {
+          await updateDoc(myCallInboxRef, {
+            calleeCandidates: arrayUnion(event.candidate.toJSON())
+          });
+        }
+      };
+
+      pc.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        remoteVideo.classList.remove('hidden');
+        remoteVideoPlaceholder.classList.add('hidden');
+        remoteIdentityLabel.textContent = `LIVE WITH ${activeMatchName.toUpperCase()}`;
+      };
+
+      // Retrieve caller's offer
+      const callSnapshot = await getDoc(myCallInboxRef);
+      const callData = callSnapshot.data();
+
+      if (callData && callData.offer) {
+        const offerDescription = new RTCSessionDescription(callData.offer);
+        await pc.setRemoteDescription(offerDescription);
+        isRemoteDescriptionSet = true;
+        flushIceCandidatesQueue();
+
+        const answerDescription = await pc.createAnswer();
+        await pc.setLocalDescription(answerDescription);
+
+        // Update answer details
+        await updateDoc(myCallInboxRef, {
+          answer: {
+            sdp: answerDescription.sdp,
+            type: answerDescription.type
+          },
+          status: 'accepted'
+        });
+
+        // Listen for candidates updates
+        currentCallStatusUnsubscribe = onSnapshot(myCallInboxRef, async (snap) => {
+          const data = snap.data();
+          if (!data) return;
+
+          if (data.status === 'ended') {
+            stopDirectCall();
+          }
+
+          if (data.callerCandidates && data.callerCandidates.length > 0) {
+            data.callerCandidates.forEach(cand => {
+              handleIceCandidateSafely(cand);
+            });
+          }
+        }, (err) => {
+          console.error("Direct call active monitor failure:", err);
+        });
+      }
+    });
+
+    // Decline Call Action
+    btnDeclineCall.addEventListener('click', async () => {
+      if (!userId) return;
+      incomingCallModal.classList.add('hidden');
+      const myCallInboxRef = doc(db, 'artifacts', appId, 'public', 'data', 'calls', userId);
+      await updateDoc(myCallInboxRef, { status: 'declined' });
+    });
+
+    // End call process
+    async function stopDirectCall() {
+      outgoingCallModal.classList.add('hidden');
+      incomingCallModal.classList.add('hidden');
+
+      if (currentCallStatusUnsubscribe) {
+        currentCallStatusUnsubscribe();
+        currentCallStatusUnsubscribe = null;
+      }
+
+      if (peerId) {
+        // Send ended command to both directions
+        try {
+          const callRefA = doc(db, 'artifacts', appId, 'public', 'data', 'calls', peerId);
+          await updateDoc(callRefA, { status: 'ended' });
+        } catch (e) {}
+        try {
+          const callRefB = doc(db, 'artifacts', appId, 'public', 'data', 'calls', userId);
+          await updateDoc(callRefB, { status: 'ended' });
+        } catch (e) {}
+      }
+
+      if (pc) {
+        pc.close();
+        pc = null;
+      }
+
+      isRemoteDescriptionSet = false;
+      iceCandidateQueue = [];
+
+      remoteVideo.srcObject = null;
+      remoteVideo.classList.add('hidden');
+      remoteVideoPlaceholder.classList.remove('hidden');
+      remoteIdentityLabel.textContent = `PEER DISCONNECTED`;
+    }
+
+    btnCancelOutgoing.addEventListener('click', stopDirectCall);
+
+    // ----------------------------------------------------
+    // COMMON RENDERING UTILITIES
+    // ----------------------------------------------------
+
+    // Message Board Universal rendering routine (Optimized for light high contrast layout)
+    function renderMessages(messages, container, scroller) {
+      const currentCards = container.children;
+      if (currentCards.length === messages.length) return;
+
+      container.innerHTML = '';
+      messages.forEach(msg => {
+        const isMe = msg.sender === userId;
+        const msgWrapper = document.createElement('div');
+        msgWrapper.className = `flex ${isMe ? 'justify-end' : 'justify-start'}`;
+
+        const isSystem = msg.sender === 'system';
+        if (isSystem) {
+          msgWrapper.className = "flex justify-center my-1.5";
+          msgWrapper.innerHTML = `
+            <div class="bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-bold px-3 py-1 rounded-full tracking-wide">
+              ${msg.text}
+            </div>
+          `;
+        } else {
+          // Render layout with media attachment triggers
+          let attachmentMarkup = "";
+          if (msg.attachment) {
+            const isImage = msg.attachment.type.startsWith('image/');
+            if (isImage) {
+              attachmentMarkup = `
+                <div class="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 max-h-48 flex items-center justify-center">
+                  <img src="${msg.attachment.data}" class="w-full h-full object-contain cursor-pointer hover:scale-102 transition" onclick="window.open(this.src)">
+                </div>
+              `;
+            } else {
+              attachmentMarkup = `
+                <div class="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                  <video src="${msg.attachment.data}" controls class="w-full max-h-48"></video>
+                </div>
+              `;
+            }
+          }
+
+          msgWrapper.innerHTML = `
+            <div class="max-w-xs md:max-w-md ${isMe ? 'theme-bg text-white rounded-2xl rounded-tr-none' : 'bg-slate-100 text-slate-800 rounded-2xl rounded-tl-none'} px-5 py-3 shadow-sm transition-all duration-300">
+              <span class="text-[9px] block opacity-75 font-bold uppercase mb-0.5 tracking-wider">${isMe ? 'You' : 'Friend'}</span>
+              <p class="text-sm font-semibold leading-relaxed break-words">${msg.text || ''}</p>
+              ${attachmentMarkup}
+            </div>
+          `;
+        }
+        container.appendChild(msgWrapper);
+      });
+
+      scroller.scrollTop = scroller.scrollHeight;
+    }
+
+    function updateTypingIndicator(typingState, element) {
+      if (!typingState || !element) return;
+      const peerIsTyping = (connectionRole === 'caller') ? typingState.callee : typingState.caller;
+      if (peerIsTyping) {
+        element.classList.remove('hidden');
+      } else {
+        element.classList.add('hidden');
+      }
+    }
+
+    async function sendMatchMessage(text) {
+      if (!currentRoomId || !text.trim()) return;
+
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', currentRoomId);
+      const newMsg = {
+        sender: userId,
+        text: text.trim(),
+        timestamp: Date.now()
+      };
+
+      try {
+        await updateDoc(roomRef, {
+          messages: arrayUnion(newMsg)
+        });
+        chatInputMatch.value = '';
+        triggerMatchTypingState(false);
+      } catch (err) {
+        console.error("Match message push error:", err);
+      }
+    }
+
+    let typingTimeoutMatch;
+    async function triggerMatchTypingState(isTyping) {
+      if (!currentRoomId) return;
+      const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', currentRoomId);
+      
+      const updatePayload = {};
+      if (connectionRole === 'caller') {
+        updatePayload['typing.caller'] = isTyping;
+      } else {
+        updatePayload['typing.callee'] = isTyping;
+      }
+
+      await updateDoc(roomRef, updatePayload);
+    }
+
+    chatInputMatch.addEventListener('input', () => {
+      triggerMatchTypingState(true);
+      clearTimeout(typingTimeoutMatch);
+      typingTimeoutMatch = setTimeout(() => {
+        triggerMatchTypingState(false);
+      }, 1500);
+    });
+
+    chatFormMatch.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sendMatchMessage(chatInputMatch.value);
+    });
+
+    function unlockChatInputs() {
+      chatInputMatch.removeAttribute('disabled');
+      btnSendMatch.removeAttribute('disabled');
+      chatInputMatch.placeholder = "Write a safe message...";
+    }
+
+    async function cleanupRoomState() {
+      if (currentRoomId) {
+        try {
+          const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', currentRoomId);
+          await updateDoc(roomRef, { status: 'disconnected' });
+        } catch (e) {}
+      }
+
+      if (roomUnsubscribe) roomUnsubscribe();
+      if (queueUnsubscribe) queueUnsubscribe();
+      if (matchCheckInterval) clearInterval(matchCheckInterval);
+
+      if (userId) {
+        try {
+          const queueDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', userId);
+          await deleteDoc(queueDocRef);
+        } catch (e) {}
+      }
+
+      if (pc) {
+        pc.close();
+        pc = null;
+      }
+
+      isRemoteDescriptionSet = false;
+      iceCandidateQueue = [];
+
+      remoteVideo.srcObject = null;
+      remoteVideo.classList.add('hidden');
+      remoteVideoPlaceholder.classList.remove('hidden');
+      remoteIdentityLabel.textContent = `PEER DISCONNECTED`;
+      
+      chatInputMatch.setAttribute('disabled', 'true');
+      btnSendMatch.setAttribute('disabled', 'true');
+      chatInputMatch.placeholder = "Find a random partner to start writing...";
+      typingIndicatorMatch.classList.add('hidden');
+      btnAddContact.classList.add('hidden');
+    }
+
+    async function handleDisconnect() {
+      await cleanupRoomState();
+      
+      isConnected = false;
+      txtAction.textContent = "Find Match";
+      btnAction.disabled = false;
+      btnStop.disabled = true;
+      btnStop.className = "bg-slate-100 text-slate-400 border border-slate-200 font-bold px-5 py-3.5 rounded-2xl hover:bg-slate-200 hover:text-slate-700 transition duration-300 flex items-center justify-center gap-2 cursor-not-allowed";
+      
+      remotePlaceholderTitle.textContent = "Disconnected";
+      remotePlaceholderDesc.textContent = "Session closed. Tap 'Find Match' to initiate another connection.";
+      addSystemMessage("You disconnected.");
+    }
+
+    function handlePeerExit() {
+      cleanupRoomState();
+      
+      isConnected = false;
+      txtAction.textContent = "Find Match";
+      btnAction.disabled = false;
+      btnStop.disabled = true;
+      btnStop.className = "bg-slate-100 text-slate-400 border border-slate-200 font-bold px-5 py-3.5 rounded-2xl hover:bg-slate-200 hover:text-slate-700 transition duration-300 flex items-center justify-center gap-2 cursor-not-allowed";
+      
+      remotePlaceholderTitle.textContent = "Disconnected";
+      remotePlaceholderDesc.textContent = "Your companion left the room. Let's find someone new!";
+      addSystemMessage("Stranger has disconnected.");
+    }
+
+    function addSystemMessage(text) {
+      const msgWrapper = document.createElement('div');
+      msgWrapper.className = "flex justify-center my-1";
+      msgWrapper.innerHTML = `
+        <div class="bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-bold px-3.5 py-1.5 rounded-full tracking-wide">
+          ${text}
+        </div>
+      `;
+      matchMessages.appendChild(msgWrapper);
+      chatScrollerMatch.scrollTop = chatScrollerMatch.scrollHeight;
+    }
+
+    btnAction.addEventListener('click', startMatchmaking);
+    btnStop.addEventListener('click', handleDisconnect);
+
+    window.addEventListener('beforeunload', async () => {
+      await cleanupRoomState();
+      await stopDirectCall();
+    });
+
+    window.onload = function() {
+      initAuthentication();
+    };
+
+  </script>
+</body>
+</html>
